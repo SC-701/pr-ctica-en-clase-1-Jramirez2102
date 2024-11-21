@@ -1,0 +1,80 @@
+
+USE Practica2;
+GO
+
+-- Tabla de Entrenadores
+CREATE TABLE Entrenador (
+    IdEntrenador UNIQUEIDENTIFIER PRIMARY KEY,
+    NombreEntrenador VARCHAR(100) NOT NULL
+);
+GO
+
+-- Tabla de Equipos
+CREATE TABLE Equipo (
+    IdEquipo UNIQUEIDENTIFIER PRIMARY KEY,
+    NombreEquipo VARCHAR(100) NOT NULL,
+    IdEntrenador UNIQUEIDENTIFIER NOT NULL,
+    FOREIGN KEY (IdEntrenador) REFERENCES Entrenador(IdEntrenador)
+);
+GO
+
+-- Tabla de Pokémon asignados a los equipos (solo para guardar IDs de los Pokémon)
+CREATE TABLE EquipoPokemon (
+    IdEquipo UNIQUEIDENTIFIER NOT NULL,
+    IdPokemon INT NOT NULL,
+    FOREIGN KEY (IdEquipo) REFERENCES Equipo(IdEquipo)
+);
+GO
+
+-- Procedimiento para insertar entrenadores
+CREATE PROCEDURE sp_InsertarEntrenador
+    @IdEntrenador UNIQUEIDENTIFIER,
+    @NombreEntrenador VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO Entrenador (IdEntrenador, NombreEntrenador)
+    VALUES (@IdEntrenador, @NombreEntrenador);
+END;
+GO
+
+-- Procedimiento para insertar equipos
+CREATE PROCEDURE sp_InsertarEquipo
+    @IdEquipo UNIQUEIDENTIFIER,
+    @NombreEquipo VARCHAR(100),
+    @IdEntrenador UNIQUEIDENTIFIER
+AS
+BEGIN
+    INSERT INTO Equipo (IdEquipo, NombreEquipo, IdEntrenador)
+    VALUES (@IdEquipo, @NombreEquipo, @IdEntrenador);
+END;
+GO
+
+-- Procedimiento para insertar Pokémon en un equipo
+CREATE PROCEDURE sp_InsertarPokemonEnEquipo
+    @IdEquipo UNIQUEIDENTIFIER,
+    @IdPokemon INT
+AS
+BEGIN
+    INSERT INTO EquipoPokemon (IdEquipo, IdPokemon)
+    VALUES (@IdEquipo, @IdPokemon);
+END;
+GO
+
+-- Procedimiento para obtener todos los equipos y sus entrenadores
+CREATE PROCEDURE sp_ObtenerEquipos
+AS
+BEGIN
+    SELECT E.IdEquipo, E.NombreEquipo, EN.NombreEntrenador 
+    FROM Equipo E 
+    INNER JOIN Entrenador EN ON E.IdEntrenador = EN.IdEntrenador;
+END;
+GO
+
+-- Procedimiento para obtener un equipo específico por su Id
+CREATE PROCEDURE sp_ObtenerEquipoPorId
+    @IdEquipo UNIQUEIDENTIFIER
+AS
+BEGIN
+    SELECT * FROM Equipo WHERE IdEquipo = @IdEquipo;
+END;
+GO
